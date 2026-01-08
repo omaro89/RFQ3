@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>RFQ Platform – Multi-RFQ + Wizard + Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- TailwindCSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-900">
+  <div id="app" class="min-h-screen flex flex-col">
+    <!-- Top bar -->
+    <header class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-4">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded bg-blue-600 flex items-center justify-center text-white font-bold">
+          R
+        </div>
+        <div>
+          <h1 class="text-sm font-semibold text-slate-800">RFQ Platform</h1>
+          <p class="text-xs text-slate-500">Multi-RFQ • Wizard • Workflow Dashboard</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 text-xs">
+        <span class="inline-flex items-center px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
+          Production-style • No RFQ deletion
+        </span>
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-[11px] font-semibold">
+            TA
+          </div>
+          <div>
+            <div class="font-medium text-slate-700">Team A User</div>
+            <div class="text-slate-400">Commercial / RFQ Owner</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main content container -->
+    <main class="flex-1 p-4">
+      <!-- RFQ LIST VIEW -->
+      <section id="rfqListView" class="space-y-4">
+        <!-- Status cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 flex flex-col">
+            <div class="text-xs text-slate-500">Total RFQs</div>
+            <div id="cardTotalRFQs" class="mt-1 text-2xl font-semibold text-slate-800">0</div>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm border border-emerald-100 p-3 flex flex-col">
+            <div class="text-xs text-emerald-600">Open RFQs</div>
+            <div id="cardOpenRFQs" class="mt-1 text-2xl font-semibold text-emerald-700">0</div>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm border border-amber-100 p-3 flex flex-col">
+            <div class="text-xs text-amber-600">On Hold</div>
+            <div id="cardOnHoldRFQs" class="mt-1 text-2xl font-semibold text-amber-700">0</div>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm border border-violet-100 p-3 flex flex-col">
+            <div class="text-xs text-violet-600">Completed</div>
+            <div id="cardCompletedRFQs" class="mt-1 text-2xl font-semibold text-violet-700">0</div>
+          </div>
+        </div>
+
+        <!-- Search + filters + create button -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 flex flex-col gap-3">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div class="flex flex-col sm:flex-row gap-2 flex-1">
+              <div class="relative flex-1">
+                <input
+                  id="searchInput"
+                  type="text"
+                  placeholder="Search by RFQ ID, Customer, or Part..."
+                  class="w-full pl-8 pr-3 py-2 text-xs rounded-md border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+                <span class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs">🔍</span>
+              </div>
+              <div class="flex gap-2">
+                <select
+                  id="statusFilter"
+                  class="px-2 py-2 text-xs rounded-md border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="Open">Open</option>
+                  <option value="On Hold">On Hold</option>
+                  <option value="Completed">Completed</option>
+                </select>
+                <select
+                  id="categoryFilter"
+                  class="px-2 py-2 text-xs rounded-md border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                >
+                  <option value="all">All Categories</option>
+                  <option value="Mechanical">Mechanical</option>
+                  <option value="Electrical">Electrical</option>
+                  <option value="Instrumentation">Instrumentation</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex justify-end">
+              <button
+                id="btnCreateNewRFQ"
+                class="inline-flex items-center gap-2 px-3 py-2 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700"
+              >
+                <span class="text-sm">＋</span>
+                <span>Create New RFQ</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RFQ table -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3">
+          <div class="flex items-center justify-between mb-2">
+            <h2 class="text-sm font-semibold text-slate-800">RFQ List</h2>
+            <span id="rfqListCount" class="text-xs text-slate-400">0 RFQs</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-xs border border-slate-200 rounded-lg overflow-hidden">
+              <thead class="bg-slate-50 text-slate-600">
+                <tr>
+                  <th class="px-3 py-2 border border-slate-200 text-left">RFQ ID</th>
+                  <th class="px-3 py-2 border border-slate-200 text-left">Customer</th>
+                  <th class="px-3 py-2 border border-slate-200 text-left">Part Description</th>
+                  <th class="px-3 py-2 border border-slate-200 text-left">Status</th>
+                  <th class="px-3 py-2 border border-slate-200 text-left">Created</th>
+                  <th class="px-3 py-2 border border-slate-200 text-left">Last Updated</th>
+                  <th class="px-3 py-2 border border-slate-200 text-left">Team A Response</th>
+                  <th class="px-3 py-2 border border-slate-200 text-left">Progress</th>
+                  <th class="px-3 py-2 border border-slate-200 text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="rfqTableBody" class="divide-y divide-slate-100">
+                <!-- Rows will be injected by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- RFQ CREATION WIZARD VIEW (HIDDEN BY DEFAULT) -->
+      <section id="wizardView" class="hidden max-w-5xl mx-auto">
+        <!-- Wizard header -->
+        <div class="mb-4 flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-semibold text-slate-800">Create New RFQ</h2>
+            <p class="text-xs text-slate-500">
+              Team A must complete all steps before the RFQ enters the workflow.
+            </p>
+          </div>
+          <button
+            id="btnCancelWizard"
+            class="px-3 py-1.5 text-xs rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200"
+          >
+            Back to RFQ List
+          </button>
+        </div>
+
+        <!-- Horizontal stepper -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-4">
+          <div class="flex items-center justify-between text-xs">
+            <div class="flex-1 flex items-center gap-2">
+              <div id="stepIndicator1" class="w-6 h-6 rounded-full flex items-center justify-center text-white text-[11px] bg-blue-600">
+                1
+              </div>
+              <div>
+                <div class="font-semibold text-slate-800">Basic Info</div>
+                <div class="text-[11px] text-slate-500">Mandatory RFQ fields</div>
+              </div>
+            </div>
+            <div class="flex-1 flex items-center gap-2">
+              <div class="h-px flex-1 bg-slate-200"></div>
+              <div id="stepIndicator2" class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] bg-slate-200 text-slate-500">
+                2
+              </div>
+              <div>
+                <div class="font-semibold text-slate-800">Attachments</div>
+                <div class="text-[11px] text-slate-500">Required documents</div>
+              </div>
+            </div>
+            <div class="flex-1 flex items-center gap-2">
+              <div class="h-px flex-1 bg-slate-200"></div>
+              <div id="stepIndicator3" class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] bg-slate-200 text-slate-500">
+                3
+              </div>
+              <div>
+                <div class="font-semibold text-slate-800">Checklist</div>
+                <div class="text-[11px] text-slate-500">Engineering must-have</div>
+              </div>
+            </div>
+            <div class="flex-1 flex items-center gap-2">
+              <div class="h-px flex-1 bg-slate-200"></div>
+              <div id="stepIndicator4" class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] bg-slate-200 text-slate-500">
+                4
+              </div>
+              <div>
+                <div class="font-semibold text-slate-800">Review & Create</div>
+                <div class="text-[11px] text-slate-500">Final validation</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Error alert -->
+        <div id="wizardErrorBox" class="hidden mb-4">
+          <div class="bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-md p-3">
+            <div class="font-semibold mb-1">Submission blocked</div>
+            <ul id="wizardErrorList" class="list-disc list-inside space-y-0.5"></ul>
+          </div>
+        </div>
+
+        <!-- STEP 1: BASIC INFO -->
+        <div id="wizardStep1" class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
+          <h3 class="text-sm font-semibold text-slate-800 mb-1">Step 1 – RFQ Basic Information</h3>
+          <p class="text-xs text-slate-500 mb-2">
+            All fields in this step are mandatory. RFQ cannot be created without them.
+          </p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div>
+              <label class="block mb-1 font-medium text-slate-700">
+                RFQ ID <span class="text-rose-600">*</span>
+              </label>
+              <input
+                id="fieldRFQId"
+                type="text"
+                class="w-full px-2 py-1.5 rounded-md border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                placeholder="e.g., RFQ-ALSTOM-2026-001"
+              />
+              <p class="mt-1 text-[11px] text-slate-400">
+                Must be unique. Spaces will be converted to hyphens.
+              </p>
+            </div>
+
+            <div>
+              <label class="block mb-1 font-medium text-slate-700">
+                Customer / Inquiry Name <span class="text-rose-600">*</span>
+              </label>
+              <input
+                id="fieldCustomerName"
+                type="text"
+                class="w-full px-2 py-1.5 rounded-md border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label class="block mb-1 font-medium text-slate-700">
+                Location <span class="text-rose-600">*</span>
+              </label>
+              <input
+                id="fieldLocation"
+                type="text"
+                class="w-full px-2 py-1.5 rounded-md border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                placeholder="e.g., Jubail, KSA"
+              />
+            </div>
+
+            <div>
+              <label class="block mb-1 font-medium text-slate-700">
+                Purpose of Inquiry <span class="text-rose-600">*</span>
+              </label>
+              <select
+                id="fieldPurpose"
+                class="w-full px-2 py-1.5 rounded-md border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="">Select purpose</option>
+                <option value="New Project">New Project</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Repair">Repair</option>
+                <option value="Spare Parts">Spare Parts</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block mb-1 font-medium text-slate-700">
+                Category of Inquiry <span class="text-rose-600">*</span>
+              </label>
+              <select
+                id="fieldCategory"
+                class="w-full px-2 py-1.5 rounded-md border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="">Select category</option>
+                <option value="Mechanical">Mechanical</option>
+                <option value="Electrical">Electrical</option>
+                <option value="Instrumentation">Instrumentation</option>
+                <option value="Civil">Civil</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block mb-1 font-medium text-slate-700">
+                Supply Scope <span class="text-rose-600">*</span>
+              </label>
+              <input
+                id="fieldSupplyScope"
+                type="text"
+                class="w-full px-2 py-1.5 rounded-md border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                placeholder="e.g., Complete casting + machining"
+              />
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block mb-1 font-medium text-slate-700">
+                Part Description <span class="text-rose-600">*</span>
+              </label>
+              <textarea
+                id="fieldPartDescription"
+                class="w-full px-2 py-1.5 rounded-md border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 min-h-[60px]"
+              ></textarea>
+            </div>
+
+            <div>
+              <label class="block mb-1 font-medium text-slate-700">
+                Customer Part Number <span class="text-rose-600">*</span>
+              </label>
+              <input
+                id="fieldCustomerPartNumber"
+                type="text"
+                class="w-full px-2 py-1.5 rounded-md border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label class="block mb-1 font-medium text-slate-700">
+                Number of Items <span class="text-rose-600">*</span>
+              </label>
+              <input
+                id="fieldNumberOfItems"
+                type="number"
+                min="1"
+                class="w-full px-2 py-1.5 rounded-md border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+            <p class="text-[11px] text-slate-500">
+              All fields are mandatory. You can’t proceed to attachments until this step is complete.
+            </p>
+            <div class="flex gap-2">
+              <button
+                id="btnStep1Next"
+                class="px-3 py-1.5 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700"
+              >
+                Next: Attachments →
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: ATTACHMENTS -->
+        <div id="wizardStep2" class="hidden bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
+          <h3 class="text-sm font-semibold text-slate-800 mb-1">Step 2 – Mandatory Attachments</h3>
+          <p class="text-xs text-slate-500 mb-2">
+            All listed documents are mandatory. RFQ cannot be created without them.
+          </p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div>
+              <label class="block mb-1 font-medium text-slate-700">
+                Customer Comments <span class="text-rose-600">*</span>
+              </label>
+              <input
+                id="attachCustomerComments"
+                type="text"
+                placeholder="File name or link (simulation)"
+                class="w-full px-2 py-1.5 rounded-md border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+              <p class="mt-1 text-[11px] text-slate-400">
+                In real system this would be a file upload. Here we simulate with a text field.
+              </p>
+            </div>
+
+            <div>
+              <label class="block mb-1 font-medium text-slate-700">
+                Drawing <span class="text-rose-600">*</span>
+              </label>
+              <input
+                id="attachDrawing"
+                type="text"
+                placeholder="File name or link"
+                class="w-full px-2 py-1.5 rounded-md border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label class="block mb-1 font-medium text-slate-700">
+                Specification <span class="text-rose-600">*</span>
+              </label>
+              <input
+                id="attachSpecification"
+                type="text"
+                placeholder="File name or link"
+                class="w-full px-2 py-1.5 rounded-md border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label class="block mb-1 font-medium text-slate-700">
+                BOQ <span class="text-rose-600">*</span>
+              </label>
+              <input
+                id="attachBOQ"
+                type="text"
+                placeholder="File name or link"
+                class="w-full px-2 py-1.5 rounded-md border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block mb-1 font-medium text-slate-700">
+                Admin-defined Required Documents <span class="text-rose-600">*</span>
+              </label>
+              <textarea
+                id="attachAdminDocs"
+                placeholder="e.g., Material certificate, Heat treatment requirement..."
+                class="w-full px-2 py-1.5 rounded-md border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 min-h-[60px]"
+              ></textarea>
+              <p class="mt-1 text-[11px] text-slate-400">
+                In a real system, Admin would define these in SLA settings. Here you can type what was provided.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+            <button
+              id="btnStep2Back"
+              class="px-3 py-1.5 text-xs rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200"
+            >
+              ← Back: Basic Info
+            </button>
+            <div class="flex gap-2">
+              <button
+                id="btnStep2Next"
+                class="px-3 py-1.5 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700"
+              >
+                Next: Engineering Checklist →
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: ENGINEERING CHECKLIST -->
+        <div id="wizardStep3" class="hidden bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
+          <h3 class="text-sm font-semibold text-slate-800 mb-1">Step 3 – Engineering Checklist</h3>
+          <p class="text-xs text-slate-500 mb-2">
+            Must-have items are mandatory. Good-to-have items are optional but tracked for completeness.
+          </p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <!-- Must-have -->
+            <div class="border border-emerald-100 rounded-lg p-3 bg-emerald-50/40">
+              <h4 class="text-xs font-semibold text-emerald-700 mb-2">Must-Have (Mandatory)</h4>
+              <div class="space-y-1.5">
+                <label class="flex items-center gap-2">
+                  <input id="chkItemList" type="checkbox" class="w-3 h-3 rounded border-slate-300" />
+                  <span>Item List available</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input id="chkQualityInspection" type="checkbox" class="w-3 h-3 rounded border-slate-300" />
+                  <span>Quality inspection requirement defined</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input id="chkWeight" type="checkbox" class="w-3 h-3 rounded border-slate-300" />
+                  <span>Weight (finish) / Part kg</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input id="chkDrawingAvailable" type="checkbox" class="w-3 h-3 rounded border-slate-300" />
+                  <span>Drawing available</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input id="chkMaterialStandards" type="checkbox" class="w-3 h-3 rounded border-slate-300" />
+                  <span>Material standards available</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Good-to-have -->
+            <div class="border border-slate-200 rounded-lg p-3 bg-slate-50/60">
+              <h4 class="text-xs font-semibold text-slate-700 mb-2">Good-to-Have (Optional)</h4>
+              <div class="space-y-1.5">
+                <label class="flex items-center gap-2">
+                  <input id="opt3DModel" type="checkbox" class="w-3 h-3 rounded border-slate-300" />
+                  <span>3D model</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input id="optSampleItem" type="checkbox" class="w-3 h-3 rounded border-slate-300" />
+                  <span>Sample of item</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input id="optMachiningDrawing" type="checkbox" class="w-3 h-3 rounded border-slate-300" />
+                  <span>Machining drawing</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input id="optCastingDrawing" type="checkbox" class="w-3 h-3 rounded border-slate-300" />
+                  <span>Casting drawing</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input id="optMinForgingRatio" type="checkbox" class="w-3 h-3 rounded border-slate-300" />
+                  <span>Minimum forging ratio</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input id="optHeatTreatmentCycle" type="checkbox" class="w-3 h-3 rounded border-slate-300" />
+                  <span>Heat treatment cycle</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+            <button
+              id="btnStep3Back"
+              class="px-3 py-1.5 text-xs rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200"
+            >
+              ← Back: Attachments
+            </button>
+            <div class="flex gap-2">
+              <button
+                id="btnStep3Next"
+                class="px-3 py-1.5 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700"
+              >
+                Next: Review & Create →
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4: REVIEW & CREATE -->
+        <div id="wizardStep4" class="hidden bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
+          <h3 class="text-sm font-semibold text-slate-800 mb-1">Step 4 – Review & Create RFQ</h3>
+          <p class="text-xs text-slate-500 mb-2">
+            Review all information below. RFQ will be created and added to the RFQ list after final validation.
+          </p>
+
+          <!-- Summary sections -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div class="border border-slate-200 rounded-lg p-3">
+              <h4 class="text-xs font-semibold text-slate-700 mb-2">Basic Information</h4>
+              <dl class="space-y-1">
+                <div class="flex justify-between gap-2">
+                  <dt class="text-slate-500">RFQ ID</dt>
+                  <dd id="summaryRFQId" class="font-medium text-slate-800 text-right"></dd>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <dt class="text-slate-500">Customer</dt>
+                  <dd id="summaryCustomerName" class="font-medium text-slate-800 text-right"></dd>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <dt class="text-slate-500">Location</dt>
+                  <dd id="summaryLocation" class="font-medium text-slate-800 text-right"></dd>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <dt class="text-slate-500">Purpose</dt>
+                  <dd id="summaryPurpose" class="font-medium text-slate-800 text-right"></dd>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <dt class="text-slate-500">Category</dt>
+                  <dd id="summaryCategory" class="font-medium text-slate-800 text-right"></dd>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <dt class="text-slate-500">Supply Scope</dt>
+                  <dd id="summarySupplyScope" class="font-medium text-slate-800 text-right"></dd>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <dt class="text-slate-500">Customer Part No.</dt>
+                  <dd id="summaryCustomerPartNumber" class="font-medium text-slate-800 text-right"></dd>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <dt class="text-slate-500">Number of Items</dt>
+                  <dd id="summaryNumberOfItems" class="font-medium text-slate-800 text-right"></dd>
+                </div>
+              </dl>
+            </div>
+
+            <div class="border border-slate-200 rounded-lg p-3">
+              <h4 class="text-xs font-semibold text-slate-700 mb-2">Attachments & Checklist</h4>
+              <dl class="space-y-1">
+                <div class="flex justify-between gap-2">
+                  <dt class="text-slate-500">Customer Comments</dt>
+                  <dd id="summaryAttachCustomerComments" class="font-medium text-slate-800 text-right"></dd>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <dt class="text-slate-500">Drawing</dt>
+                  <dd id="summaryAttachDrawing" class="font-medium text-slate-800 text-right"></dd>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <dt class="text-slate-500">Specification</dt>
+                  <dd id="summaryAttachSpecification" class="font-medium text-slate-800 text-right"></dd>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <dt class="text-slate-500">BOQ</dt>
+                  <dd id="summaryAttachBOQ" class="font-medium text-slate-800 text-right"></dd>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <dt class="text-slate-500">Admin Docs</dt>
+                  <dd id="summaryAttachAdminDocs" class="font-medium text-slate-800 text-right"></dd>
+                </div>
+              </dl>
+              <div class="mt-3 border-t border-slate-100 pt-2">
+                <div class="text-[11px] text-slate-500 mb-1">Engineering Checklist</div>
+                <ul id="summaryChecklist" class="text-[11px] text-slate-700 list-disc list-inside space-y-0.5"></ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+            <button
+              id="btnStep4Back"
+              class="px-3 py-1.5 text-xs rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200"
+            >
+              ← Back: Checklist
+            </button>
+            <div class="flex gap-2">
+              <button
+                id="btnCreateRFQ"
+                class="px-3 py-1.5 text-xs rounded-md bg-emerald-600 text-white hover:bg-emerald-700"
+              >
+                ✅ Create RFQ & Go to Dashboard
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DASHBOARD VIEW (will be filled in Part 3) -->
+      <section id="dashboardView" class="hidden">
+        <!-- Placeholder; full dashboard will be added in Part 3 -->
+      </section>
+    </main>
+  </div>
+
+  <!-- Part 2 and Part 3 scripts will be appended below -->
+<script>
+/* ---------------------------------------------------------
+   GLOBAL STATE + LOCAL STORAGE HANDLING
+--------------------------------------------------------- */
+let rfqs = []; // All RFQs stored here
+let currentRFQ = null; // The RFQ currently opened in dashboard
+let wizardStep = 1;
+
+// Load RFQs from localStorage
+function loadRFQs() {
+  const saved = localStorage.getItem("rfqList");
+  rfqs = saved ? JSON.parse(saved) : [];
+}
+
+// Save RFQs to localStorage
+function saveRFQs() {
+  localStorage.setItem("rfqList", JSON.stringify(rfqs));
+}
+
+/* ---------------------------------------------------------
+   VIEW SWITCHING
+--------------------------------------------------------- */
+function showRFQList() {
+  document.getElementById("rfqListView").classList.remove("hidden");
+  document.getElementById("wizardView").classList.add("hidden");
+  document.getElementById("dashboardView").classList.add("hidden");
+  renderRFQList();
+}
+
+function showWizard() {
+  wizardStep = 1;
+  updateWizardStepUI();
+  clearWizardErrors();
+  document.getElementById("rfqListView").classList.add("hidden");
+  document.getElementById("wizardView").classList.remove("hidden");
+  document.getElementById("dashboardView").classList.add("hidden");
+}
+
+function showDashboard(rfqId) {
+  currentRFQ = rfqs.find(r => r.id === rfqId);
+  if (!currentRFQ) return;
+  document.getElementById("rfqListView").classList.add("hidden");
+  document.getElementById("wizardView").classList.add("hidden");
+  document.getElementById("dashboardView").classList.remove("hidden");
+  renderDashboard(); // Part 3 will define this
+}
+
+/* ---------------------------------------------------------
+   RFQ LIST RENDERING
+--------------------------------------------------------- */
+function renderRFQList() {
+  loadRFQs();
+
+  // Status counts
+  const total = rfqs.length;
+  const open = rfqs.filter(r => r.status === "Open").length;
+  const hold = rfqs.filter(r => r.status === "On Hold").length;
+  const completed = rfqs.filter(r => r.status === "Completed").length;
+
+  document.getElementById("cardTotalRFQs").textContent = total;
+  document.getElementById("cardOpenRFQs").textContent = open;
+  document.getElementById("cardOnHoldRFQs").textContent = hold;
+  document.getElementById("cardCompletedRFQs").textContent = completed;
+  document.getElementById("rfqListCount").textContent = `${total} RFQs`;
+
+  const tbody = document.getElementById("rfqTableBody");
+  tbody.innerHTML = "";
+
+  const search = document.getElementById("searchInput").value.toLowerCase();
+  const statusFilter = document.getElementById("statusFilter").value;
+  const categoryFilter = document.getElementById("categoryFilter").value;
+
+  const filtered = rfqs.filter(r => {
+    const matchesSearch =
+      r.id.toLowerCase().includes(search) ||
+      r.customer.toLowerCase().includes(search) ||
+      r.partDescription.toLowerCase().includes(search);
+
+    const matchesStatus =
+      statusFilter === "all" || r.status === statusFilter;
+
+    const matchesCategory =
+      categoryFilter === "all" || r.category === categoryFilter;
+
+    return matchesSearch && matchesStatus && matchesCategory;
+  });
+
+  filtered.forEach(r => {
+    const tr = document.createElement("tr");
+    tr.className = "hover:bg-slate-50";
+
+    tr.innerHTML = `
+      <td class="px-3 py-2 border border-slate-200">${r.id}</td>
+      <td class="px-3 py-2 border border-slate-200">${r.customer}</td>
+      <td class="px-3 py-2 border border-slate-200">${r.partDescription}</td>
+      <td class="px-3 py-2 border border-slate-200">
+        <span class="px-2 py-1 text-[11px] rounded-full ${
+          r.status === "Completed"
+            ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+            : r.status === "On Hold"
+            ? "bg-amber-50 text-amber-700 border border-amber-100"
+            : "bg-blue-50 text-blue-700 border border-blue-100"
+        }">${r.status}</span>
+      </td>
+      <td class="px-3 py-2 border border-slate-200">${r.createdAt}</td>
+      <td class="px-3 py-2 border border-slate-200">${r.lastUpdated}</td>
+      <td class="px-3 py-2 border border-slate-200">${r.teamAResponse || "-"}</td>
+      <td class="px-3 py-2 border border-slate-200">${r.progress || "0%"}</td>
+      <td class="px-3 py-2 border border-slate-200">
+        <button class="px-2 py-1 text-[11px] rounded bg-blue-600 text-white hover:bg-blue-700"
+          onclick="showDashboard('${r.id}')">
+          Open RFQ
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ---------------------------------------------------------
+   WIZARD STEP UI HANDLING
+--------------------------------------------------------- */
+function updateWizardStepUI() {
+  // Hide all steps
+  document.getElementById("wizardStep1").classList.add("hidden");
+  document.getElementById("wizardStep2").classList.add("hidden");
+  document.getElementById("wizardStep3").classList.add("hidden");
+  document.getElementById("wizardStep4").classList.add("hidden");
+
+  // Reset indicators
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById(`stepIndicator${i}`);
+    el.className =
+      "w-6 h-6 rounded-full flex items-center justify-center text-[11px] bg-slate-200 text-slate-500";
+  }
+
+  // Activate current step
+  document.getElementById(`wizardStep${wizardStep}`).classList.remove("hidden");
+  const active = document.getElementById(`stepIndicator${wizardStep}`);
+  active.className =
+    "w-6 h-6 rounded-full flex items-center justify-center text-white text-[11px] bg-blue-600";
+}
+
+function clearWizardErrors() {
+  document.getElementById("wizardErrorBox").classList.add("hidden");
+  document.getElementById("wizardErrorList").innerHTML = "";
+}
+
+function showWizardErrors(errors) {
+  const box = document.getElementById("wizardErrorBox");
+  const list = document.getElementById("wizardErrorList");
+  list.innerHTML = "";
+  errors.forEach(e => {
+    const li = document.createElement("li");
+    li.textContent = e;
+    list.appendChild(li);
+  });
+  box.classList.remove("hidden");
+}
+
+/* ---------------------------------------------------------
+   STEP 1 VALIDATION
+--------------------------------------------------------- */
+function validateStep1() {
+  const errors = [];
+
+  const id = document.getElementById("fieldRFQId").value.trim();
+  const customer = document.getElementById("fieldCustomerName").value.trim();
+  const location = document.getElementById("fieldLocation").value.trim();
+  const purpose = document.getElementById("fieldPurpose").value;
+  const category = document.getElementById("fieldCategory").value;
+  const scope = document.getElementById("fieldSupplyScope").value.trim();
+  const desc = document.getElementById("fieldPartDescription").value.trim();
+  const partNo = document.getElementById("fieldCustomerPartNumber").value.trim();
+  const qty = document.getElementById("fieldNumberOfItems").value;
+
+  if (!id) errors.push("RFQ ID is required.");
+  if (rfqs.some(r => r.id.toLowerCase() === id.toLowerCase()))
+    errors.push("RFQ ID already exists.");
+
+  if (!customer) errors.push("Customer name is required.");
+  if (!location) errors.push("Location is required.");
+  if (!purpose) errors.push("Purpose of inquiry is required.");
+  if (!category) errors.push("Category is required.");
+  if (!scope) errors.push("Supply scope is required.");
+  if (!desc) errors.push("Part description is required.");
+  if (!partNo) errors.push("Customer part number is required.");
+  if (!qty || qty <= 0) errors.push("Number of items must be greater than 0.");
+
+  return errors;
+}
+
+/* ---------------------------------------------------------
+   STEP 2 VALIDATION
+--------------------------------------------------------- */
+function validateStep2() {
+  const errors = [];
+
+  if (!document.getElementById("attachCustomerComments").value.trim())
+    errors.push("Customer comments attachment is required.");
+
+  if (!document.getElementById("attachDrawing").value.trim())
+    errors.push("Drawing attachment is required.");
+
+  if (!document.getElementById("attachSpecification").value.trim())
+    errors.push("Specification attachment is required.");
+
+  if (!document.getElementById("attachBOQ").value.trim())
+    errors.push("BOQ attachment is required.");
+
+  if (!document.getElementById("attachAdminDocs").value.trim())
+    errors.push("Admin-defined required documents must be provided.");
+
+  return errors;
+}
+
+/* ---------------------------------------------------------
+   STEP 3 VALIDATION
+--------------------------------------------------------- */
+function validateStep3() {
+  const errors = [];
+
+  if (!document.getElementById("chkItemList").checked)
+    errors.push("Item list must be available.");
+
+  if (!document.getElementById("chkQualityInspection").checked)
+    errors.push("Quality inspection requirement must be defined.");
+
+  if (!document.getElementById("chkWeight").checked)
+    errors.push("Weight (finish) / Part kg must be provided.");
+
+  if (!document.getElementById("chkDrawingAvailable").checked)
+    errors.push("Drawing must be available.");
+
+  if (!document.getElementById("chkMaterialStandards").checked)
+    errors.push("Material standards must be available.");
+
+  return errors;
+}
+
+/* ---------------------------------------------------------
+   STEP 4 — POPULATE SUMMARY
+--------------------------------------------------------- */
+function populateSummary() {
+  document.getElementById("summaryRFQId").textContent =
+    document.getElementById("fieldRFQId").value;
+  document.getElementById("summaryCustomerName").textContent =
+    document.getElementById("fieldCustomerName").value;
+  document.getElementById("summaryLocation").textContent =
+    document.getElementById("fieldLocation").value;
+  document.getElementById("summaryPurpose").textContent =
+    document.getElementById("fieldPurpose").value;
+  document.getElementById("summaryCategory").textContent =
+    document.getElementById("fieldCategory").value;
+  document.getElementById("summarySupplyScope").textContent =
+    document.getElementById("fieldSupplyScope").value;
+  document.getElementById("summaryCustomerPartNumber").textContent =
+    document.getElementById("fieldCustomerPartNumber").value;
+  document.getElementById("summaryNumberOfItems").textContent =
+    document.getElementById("fieldNumberOfItems").value;
+
+  document.getElementById("summaryAttachCustomerComments").textContent =
+    document.getElementById("attachCustomerComments").value;
+  document.getElementById("summaryAttachDrawing").textContent =
+    document.getElementById("attachDrawing").value;
+  document.getElementById("summaryAttachSpecification").textContent =
+    document.getElementById("attachSpecification").value;
+  document.getElementById("summaryAttachBOQ").textContent =
+    document.getElementById("attachBOQ").value;
+  document.getElementById("summaryAttachAdminDocs").textContent =
+    document.getElementById("attachAdminDocs").value;
+
+  const checklist = document.getElementById("summaryChecklist");
+  checklist.innerHTML = "";
+
+  const mustHave = [
+    ["Item List available", "chkItemList"],
+    ["Quality inspection requirement", "chkQualityInspection"],
+    ["Weight / Part kg", "chkWeight"],
+    ["Drawing available", "chkDrawingAvailable"],
+    ["Material standards available", "chkMaterialStandards"]
+  ];
+
+  mustHave.forEach(([label, id]) => {
+    const li = document.createElement("li");
+    li.textContent = `${label}: ${
+      document.getElementById(id).checked ? "✔" : "✘"
+    }`;
+    checklist.appendChild(li);
+  });
+}
+
+/* ---------------------------------------------------------
+   CREATE RFQ
+--------------------------------------------------------- */
+function createRFQ() {
+  const now = new Date().toLocaleString();
+
+  const newRFQ = {
+    id: document.getElementById("fieldRFQId").value.trim(),
+    customer: document.getElementById("fieldCustomerName").value.trim(),
+    location: document.getElementById("fieldLocation").value.trim(),
+    purpose: document.getElementById("fieldPurpose").value,
+    category: document.getElementById("fieldCategory").value,
+    supplyScope: document.getElementById("fieldSupplyScope").value.trim(),
+    partDescription: document.getElementById("fieldPartDescription").value.trim(),
+    customerPartNumber: document.getElementById("fieldCustomerPartNumber").value.trim(),
+    numberOfItems: document.getElementById("fieldNumberOfItems").value,
+
+    attachments: {
+      comments: document.getElementById("attachCustomerComments").value.trim(),
+      drawing: document.getElementById("attachDrawing").value.trim(),
+      specification: document.getElementById("attachSpecification").value.trim(),
+      boq: document.getElementById("attachBOQ").value.trim(),
+      adminDocs: document.getElementById("attachAdminDocs").value.trim()
+    },
+
+    checklist: {
+      itemList: document.getElementById("chkItemList").checked,
+      qualityInspection: document.getElementById("chkQualityInspection").checked,
+      weight: document.getElementById("chkWeight").checked,
+      drawingAvailable: document.getElementById("chkDrawingAvailable").checked,
+      materialStandards: document.getElementById("chkMaterialStandards").checked,
+
+      optional: {
+        model3D: document.getElementById("opt3DModel").checked,
+        sampleItem: document.getElementById("optSampleItem").checked,
+        machiningDrawing: document.getElementById("optMachiningDrawing").checked,
+        castingDrawing: document.getElementById("optCastingDrawing").checked,
+        forgingRatio: document.getElementById("optMinForgingRatio").checked,
+        heatTreatment: document.getElementById("optHeatTreatmentCycle").checked
+      }
+    },
+
+    createdAt: now,
+    lastUpdated: now,
+    status: "Open",
+    teamAResponse: "-",
+    progress: "0%",
+
+    workflow: {}, // Part 3 will populate this
+    notifications: [],
+    holdHistory: []
+  };
+
+  rfqs.push(newRFQ);
+  saveRFQs();
+  showDashboard(newRFQ.id);
+}
+
+/* ---------------------------------------------------------
+   EVENT LISTENERS
+--------------------------------------------------------- */
+document.getElementById("btnCreateNewRFQ").addEventListener("click", showWizard);
+document.getElementById("btnCancelWizard").addEventListener("click", showRFQList);
+
+// Step 1 → Step 2
+document.getElementById("btnStep1Next").addEventListener("click", () => {
+  const errors = validateStep1();
+  if (errors.length) return showWizardErrors(errors);
+  clearWizardErrors();
+  wizardStep = 2;
+  updateWizardStepUI();
+});
+
+// Step 2 → Step 3
+document.getElementById("btnStep2Next").addEventListener("click", () => {
+  const errors = validateStep2();
+  if (errors.length) return showWizardErrors(errors);
+  clearWizardErrors();
+  wizardStep = 3;
+  updateWizardStepUI();
+});
+
+// Step 3 → Step 4
+document.getElementById("btnStep3Next").addEventListener("click", () => {
+  const errors = validateStep3();
+  if (errors.length) return showWizardErrors(errors);
+  clearWizardErrors();
+  populateSummary();
+  wizardStep = 4;
+  updateWizardStepUI();
+});
+
+// Back buttons
+document.getElementById("btnStep2Back").addEventListener("click", () => {
+  wizardStep = 1;
+  updateWizardStepUI();
+});
+document.getElementById("btnStep3Back").addEventListener("click", () => {
+  wizardStep = 2;
+  updateWizardStepUI();
+});
+document.getElementById("btnStep4Back").addEventListener("click", () => {
+  wizardStep = 3;
+  updateWizardStepUI();
+});
+
+// Final create RFQ
+document.getElementById("btnCreateRFQ").addEventListener("click", () => {
+  const errors1 = validateStep1();
+  const errors2 = validateStep2();
+  const errors3 = validateStep3();
+  const allErrors = [...errors1, ...errors2, ...errors3];
+
+  if (allErrors.length) return showWizardErrors(allErrors);
+
+  createRFQ();
+});
+
+// Filters + search
+document.getElementById("searchInput").addEventListener("input", renderRFQList);
+document.getElementById("statusFilter").addEventListener("change", renderRFQList);
+document.getElementById("categoryFilter").addEventListener("change", renderRFQList);
+
+/* ---------------------------------------------------------
+   INITIAL LOAD
+--------------------------------------------------------- */
+loadRFQs();
+renderRFQList();
+</script>
+<script>
+/* ---------------------------------------------------------
+   DASHBOARD RENDERING (PER RFQ)
+--------------------------------------------------------- */
+
+function renderDashboard() {
+  const view = document.getElementById("dashboardView");
+  view.innerHTML = "";
+
+  if (!currentRFQ) {
+    view.innerHTML = `
+      <div class="max-w-4xl mx-auto mt-6 bg-white border border-slate-200 rounded-xl p-4 text-xs text-slate-600">
+        No RFQ selected.
+      </div>`;
+    return;
+  }
+
+  const header = `
+    <div class="max-w-6xl mx-auto mt-4 space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="text-[11px] text-slate-500">RFQ Dashboard</div>
+          <div class="text-sm font-semibold text-slate-800">
+            RFQ ID: ${currentRFQ.id}
+          </div>
+          <div class="text-[11px] text-slate-500">
+            Customer: <span class="font-medium text-slate-700">${currentRFQ.customer}</span> •
+            Category: <span class="font-medium text-slate-700">${currentRFQ.category}</span> •
+            Status:
+            <span class="px-2 py-0.5 text-[11px] rounded-full ${
+              currentRFQ.status === "Completed"
+                ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                : currentRFQ.status === "On Hold"
+                ? "bg-amber-50 text-amber-700 border border-amber-100"
+                : "bg-blue-50 text-blue-700 border border-blue-100"
+            }">${currentRFQ.status}</span>
+          </div>
+        </div>
+
+        <button
+          onclick="showRFQList()"
+          class="px-3 py-1.5 text-xs rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200"
+        >
+          ← Back to RFQ List
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 text-xs">
+          <div class="text-slate-500">Created At</div>
+          <div class="mt-1 text-sm font-semibold text-slate-800">${currentRFQ.createdAt}</div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 text-xs">
+          <div class="text-slate-500">Last Updated</div>
+          <div class="mt-1 text-sm font-semibold text-slate-800">${currentRFQ.lastUpdated}</div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 text-xs">
+          <div class="text-slate-500">Team A Response</div>
+          <div class="mt-1 text-sm font-semibold text-slate-800">${currentRFQ.teamAResponse || "-"}</div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 text-xs">
+          <div class="text-slate-500">Overall Progress</div>
+          <div class="mt-1 text-sm font-semibold text-blue-700">${currentRFQ.progress || "0%"}</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const workflow = `
+    <div class="max-w-6xl mx-auto mt-4 grid grid-cols-1 lg:grid-cols-4 gap-4 text-xs">
+
+      <!-- LEFT SIDE: TEAM WORKFLOW -->
+      <div class="lg:col-span-3 space-y-3">
+
+        <!-- TEAM A -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <div class="text-[11px] text-slate-500">Team A – RFQ & Commercial</div>
+              <div class="text-sm font-semibold text-slate-800">RFQ Owner</div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <button
+              onclick="submitRFQToTeamB()"
+              class="px-3 py-1.5 text-[11px] rounded-md bg-blue-600 text-white hover:bg-blue-700"
+            >
+              Submit RFQ to Team B
+            </button>
+
+            <button
+              onclick="simulateTeamAResponse()"
+              class="px-3 py-1.5 text-[11px] rounded-md bg-emerald-600 text-white hover:bg-emerald-700"
+            >
+              Resolve Missing Info
+            </button>
+
+            <button
+              onclick="releaseFromHold()"
+              class="px-3 py-1.5 text-[11px] rounded-md bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100"
+            >
+              Release from Hold
+            </button>
+          </div>
+        </div>
+
+        <!-- TEAM B -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <div class="text-[11px] text-slate-500">Team B – Technical</div>
+              <div class="text-sm font-semibold text-slate-800">Technical Evaluation</div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <button
+              onclick="markTeamCompleted('Team B')"
+              class="px-3 py-1.5 text-[11px] rounded-md bg-emerald-600 text-white hover:bg-emerald-700"
+            >
+              Mark Team B Completed
+            </button>
+
+            <button
+              onclick="openHoldPanel('Team B')"
+              class="px-3 py-1.5 text-[11px] rounded-md bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100"
+            >
+              Request Missing Info
+            </button>
+          </div>
+        </div>
+
+        <!-- TEAM C -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <div class="text-[11px] text-slate-500">Team C – Quality</div>
+              <div class="text-sm font-semibold text-slate-800">Quality Requirements</div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <button
+              onclick="markTeamCompleted('Team C')"
+              class="px-3 py-1.5 text-[11px] rounded-md bg-emerald-600 text-white hover:bg-emerald-700"
+            >
+              Mark Team C Completed
+            </button>
+
+            <button
+              onclick="openHoldPanel('Team C')"
+              class="px-3 py-1.5 text-[11px] rounded-md bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100"
+            >
+              Request Missing Info
+            </button>
+          </div>
+        </div>
+
+        <!-- TEAM D -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <div class="text-[11px] text-slate-500">Team D – Production Control</div>
+              <div class="text-sm font-semibold text-slate-800">Painting & Packing</div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <button
+              onclick="markTeamDCompleted()"
+              class="px-3 py-1.5 text-[11px] rounded-md bg-emerald-600 text-white hover:bg-emerald-700"
+            >
+              Mark Team D Completed
+            </button>
+
+            <button
+              onclick="openHoldPanel('Team D')"
+              class="px-3 py-1.5 text-[11px] rounded-md bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100"
+            >
+              Request Missing Info
+            </button>
+          </div>
+        </div>
+
+        <!-- TEAM E -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <div class="text-[11px] text-slate-500">Team E – Safety</div>
+              <div class="text-sm font-semibold text-slate-800">Safety Requirements</div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <button
+              onclick="markTeamCompleted('Team E')"
+              class="px-3 py-1.5 text-[11px] rounded-md bg-emerald-600 text-white hover:bg-emerald-700"
+            >
+              Mark Team E Completed
+            </button>
+
+            <button
+              onclick="openHoldPanel('Team E')"
+              class="px-3 py-1.5 text-[11px] rounded-md bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100"
+            >
+              Request Missing Info
+            </button>
+          </div>
+        </div>
+
+        <!-- FINAL QUOTATION -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3">
+          <div class="text-sm font-semibold text-slate-800 mb-2">Final Quotation</div>
+
+          <p class="text-[11px] text-slate-500 mb-2">
+            Team B can submit the final quotation only after Team C, Team D, and Team E are completed.
+          </p>
+
+          <button
+            onclick="submitFinalQuotation()"
+            class="px-3 py-1.5 text-[11px] rounded-md bg-violet-600 text-white hover:bg-violet-700"
+          >
+            Submit Final Quotation
+          </button>
+        </div>
+
+      </div>
+
+      <!-- RIGHT SIDE: NOTIFICATIONS + HOLD HISTORY -->
+      <div class="space-y-3">
+
+        <!-- NOTIFICATIONS -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3">
+          <div class="flex items-center justify-between mb-2">
+            <div class="text-sm font-semibold text-slate-800">Notifications</div>
+            <button
+              onclick="clearNotifications()"
+              class="text-[11px] text-slate-400 hover:text-slate-600"
+            >
+              Clear
+            </button>
+          </div>
+          <div id="notificationsList" class="space-y-1 max-h-64 overflow-y-auto text-[11px] text-slate-600"></div>
+        </div>
+
+        <!-- HOLD HISTORY -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3">
+          <div class="text-sm font-semibold text-slate-800 mb-2">Hold History</div>
+          <div id="holdHistoryList" class="space-y-1 max-h-64 overflow-y-auto text-[11px] text-slate-600"></div>
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+  view.innerHTML = header + workflow;
+
+  renderNotifications();
+  renderHoldHistory();
+}
+
+/* ---------------------------------------------------------
+   TEAM D COMPLETION
+--------------------------------------------------------- */
+function markTeamDCompleted() {
+  if (!currentRFQ) return;
+
+  currentRFQ.workflow = currentRFQ.workflow || {};
+  currentRFQ.workflow["Team D"] = {
+    completed: true,
+    completedAt: new Date().toLocaleString()
+  };
+
+  addNotification("Team D marked Painting & Packing as completed.");
+
+  updateProgress();
+  saveRFQs();
+  renderDashboard();
+  renderRFQList();
+}
+
+/* ---------------------------------------------------------
+   TEAM COMPLETION (B, C, E)
+--------------------------------------------------------- */
+function markTeamCompleted(teamName) {
+  if (!currentRFQ) return;
+
+  currentRFQ.workflow = currentRFQ.workflow || {};
+  currentRFQ.workflow[teamName] = {
+    completed: true,
+    completedAt: new Date().toLocaleString()
+  };
+
+  addNotification(`${teamName} marked their tasks as completed.`);
+
+  updateProgress();
+  saveRFQs();
+  renderDashboard();
+  renderRFQList();
+}
+
+/* ---------------------------------------------------------
+   PROGRESS CALCULATION
+--------------------------------------------------------- */
+function updateProgress() {
+  const teams = ["Team B", "Team C", "Team D", "Team E"];
+  let done = 0;
+
+  teams.forEach(t => {
+    if (currentRFQ.workflow[t] && currentRFQ.workflow[t].completed) done++;
+  });
+
+  const progress = (done / teams.length) * 100;
+  currentRFQ.progress = progress.toFixed(0) + "%";
+}
+
+/* ---------------------------------------------------------
+   FINAL QUOTATION
+--------------------------------------------------------- */
+function submitFinalQuotation() {
+  if (!currentRFQ) return;
+
+  const required = ["Team B", "Team C", "Team D", "Team E"];
+  const incomplete = required.filter(
+    t => !currentRFQ.workflow[t] || !currentRFQ.workflow[t].completed
+  );
+
+  if (incomplete.length > 0) {
+    alert(
+      "Final quotation cannot be submitted.\n\nPending teams:\n- " +
+        incomplete.join("\n- ")
+    );
+    return;
+  }
+
+  currentRFQ.status = "Completed";
+  currentRFQ.progress = "100%";
+  currentRFQ.lastUpdated = new Date().toLocaleString();
+
+  addNotification("Final quotation submitted by Team B.");
+  saveRFQs();
+  renderDashboard();
+  renderRFQList();
+}
+
+/* ---------------------------------------------------------
+   HOLD / RELEASE LOGIC
+--------------------------------------------------------- */
+function openHoldPanel(teamName) {
+  const reason = prompt(teamName + " is requesting missing information.\n\nEnter reason:");
+  if (!reason) return;
+
+  const now = new Date().toLocaleString();
+
+  currentRFQ.holdHistory = currentRFQ.holdHistory || [];
+  currentRFQ.holdHistory.unshift({
+    team: teamName,
+    reason,
+    holdAt: now,
+    releaseAt: null
+  });
+
+  currentRFQ.status = "On Hold";
+  currentRFQ.lastUpdated = now;
+
+  addNotification(`${teamName} put RFQ on hold. Reason: ${reason}`);
+  saveRFQs();
+  renderDashboard();
+  renderRFQList();
+}
+
+function releaseFromHold() {
+  if (!currentRFQ || currentRFQ.status !== "On Hold") {
+    alert("RFQ is not on hold.");
+    return;
+  }
+
+  const latest = currentRFQ.holdHistory.find(h => !h.releaseAt);
+  if (!latest) return;
+
+  latest.releaseAt = new Date().toLocaleString();
+  currentRFQ.status = "Open";
+  currentRFQ.lastUpdated = latest.releaseAt;
+
+  addNotification("Team A released the RFQ from hold.");
+  saveRFQs();
+  renderDashboard();
+  renderRFQList();
+}
+
+/* ---------------------------------------------------------
+   TEAM A RESPONSE
+--------------------------------------------------------- */
+function simulateTeamAResponse() {
+  if (!currentRFQ) return;
+
+  const latest = currentRFQ.holdHistory?.find(h => !h.releaseAt);
+  if (!latest) {
+    alert("No pending missing info requests.");
+    return;
+  }
+
+  const now = new Date();
+  latest.releaseAt = now.toLocaleString();
+
+  const holdTime = new Date(latest.holdAt);
+  const diffMinutes = Math.round((now - holdTime) / 60000);
+
+  currentRFQ.teamAResponse = diffMinutes + " min";
+  currentRFQ.status = "Open";
+  currentRFQ.lastUpdated = now.toLocaleString();
+
+  addNotification(`Team A resolved missing info in ${diffMinutes} minutes.`);
+  saveRFQs();
+  renderDashboard();
+  renderRFQList();
+}
+
+/* ---------------------------------------------------------
+   SUBMIT RFQ TO TEAM B
+--------------------------------------------------------- */
+function submitRFQToTeamB() {
+  addNotification("Team A submitted the RFQ to Team B.");
+  currentRFQ.lastUpdated = new Date().toLocaleString();
+  saveRFQs();
+  renderDashboard();
+}
+
+/* ---------------------------------------------------------
+   NOTIFICATIONS
+--------------------------------------------------------- */
+function addNotification(message) {
+  const now = new Date().toLocaleString();
+  currentRFQ.notifications = currentRFQ.notifications || [];
+  currentRFQ.notifications.unshift({ message, time: now });
+  saveRFQs();
+}
+
+function renderNotifications() {
+  const container = document.getElementById("notificationsList");
+  container.innerHTML = "";
+
+  if (!currentRFQ.notifications || currentRFQ.notifications.length === 0) {
+    container.innerHTML = '<div class="text-[11px] text-slate-400">No notifications.</div>';
+    return;
+  }
+
+  currentRFQ.notifications.forEach(n => {
+    const div = document.createElement("div");
+    div.className = "border border-slate-100 rounded-md px-2 py-1 bg-slate-50";
+    div.innerHTML = `
+      <div class="text-[11px] text-slate-800">${n.message}</div>
+      <div class="text-[10px] text-slate-400">${n.time}</div>
