@@ -1060,10 +1060,6 @@ renderRFQList();
    DASHBOARD RENDERING (PER RFQ)
 --------------------------------------------------------- */
 
-/* ============================================================
-   SECTION 1 — DASHBOARD LAYOUT (RFQ3 STYLE)
-   ============================================================ */
-
 function renderDashboard() {
   const view = document.getElementById("dashboardView");
   if (!currentRFQ) {
@@ -1163,4 +1159,108 @@ function renderDashboard() {
   renderAttachments();
   renderNotifications();
   renderHoldHistory();
- }
+}
+
+/* ---------------------------------------------------------
+   COMMENTS
+--------------------------------------------------------- */
+
+function renderComments() {
+  const list = document.getElementById("commentsList");
+  list.innerHTML = "";
+
+  if (!currentRFQ.comments) currentRFQ.comments = [];
+
+  currentRFQ.comments.forEach(c => {
+    const div = document.createElement("div");
+    div.className = "comment-item";
+    div.textContent = c;
+    list.appendChild(div);
+  });
+}
+
+function addComment() {
+  const input = document.getElementById("commentInput");
+  const text = input.value.trim();
+  if (!text) return;
+
+  if (!currentRFQ.comments) currentRFQ.comments = [];
+  currentRFQ.comments.push(text);
+
+  input.value = "";
+  saveRFQs();
+  renderComments();
+}
+
+/* ---------------------------------------------------------
+   ATTACHMENTS
+--------------------------------------------------------- */
+
+function renderAttachments() {
+  const list = document.getElementById("attachmentsList");
+  list.innerHTML = "";
+
+  if (!currentRFQ.attachmentsList) currentRFQ.attachmentsList = [];
+
+  currentRFQ.attachmentsList.forEach(a => {
+    const div = document.createElement("div");
+    div.className = "attachment-item";
+    div.textContent = a;
+    list.appendChild(div);
+  });
+}
+
+function addAttachment() {
+  const input = document.getElementById("attachmentInput");
+  const text = input.value.trim();
+  if (!text) return;
+
+  if (!currentRFQ.attachmentsList) currentRFQ.attachmentsList = [];
+  currentRFQ.attachmentsList.push(text);
+
+  input.value = "";
+  saveRFQs();
+  renderAttachments();
+}
+
+/* ---------------------------------------------------------
+   NOTIFICATIONS
+--------------------------------------------------------- */
+
+function renderNotifications() {
+  const list = document.getElementById("notificationsList");
+  list.innerHTML = "";
+
+  if (!currentRFQ.notifications) currentRFQ.notifications = [];
+
+  currentRFQ.notifications.forEach(n => {
+    const div = document.createElement("div");
+    div.className = "notification-item";
+    div.textContent = n;
+    list.appendChild(div);
+  });
+}
+
+function clearNotifications() {
+  currentRFQ.notifications = [];
+  saveRFQs();
+  renderNotifications();
+}
+
+/* ---------------------------------------------------------
+   HOLD HISTORY
+--------------------------------------------------------- */
+
+function renderHoldHistory() {
+  const list = document.getElementById("holdHistoryList");
+  list.innerHTML = "";
+
+  if (!currentRFQ.holdHistory) currentRFQ.holdHistory = [];
+
+  currentRFQ.holdHistory.forEach(h => {
+    const div = document.createElement("div");
+    div.className = "hold-item";
+    div.textContent = `${h.team}: ${h.reason} (${h.date})`;
+    list.appendChild(div);
+  });
+}
