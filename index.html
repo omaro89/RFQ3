@@ -1161,57 +1161,7 @@ function renderDashboard() {
   renderHoldHistory();
  }
 
-  const header = `
-    <div class="max-w-6xl mx-auto mt-4 space-y-4">
-      <div class="flex items-center justify-between">
-        <div>
-          <div class="text-[11px] text-slate-500">RFQ Dashboard</div>
-          <div class="text-sm font-semibold text-slate-800">
-            RFQ ID: ${currentRFQ.id}
-          </div>
-          <div class="text-[11px] text-slate-500">
-            Customer: <span class="font-medium text-slate-700">${currentRFQ.customer}</span> •
-            Category: <span class="font-medium text-slate-700">${currentRFQ.category}</span> •
-            Status:
-            <span class="px-2 py-0.5 text-[11px] rounded-full ${
-              currentRFQ.status === "Completed"
-                ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
-                : currentRFQ.status === "On Hold"
-                ? "bg-amber-50 text-amber-700 border border-amber-100"
-                : "bg-blue-50 text-blue-700 border border-blue-100"
-            }">${currentRFQ.status}</span>
-          </div>
-        </div>
-
-        <button
-          onclick="showRFQList()"
-          class="px-3 py-1.5 text-xs rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200"
-        >
-          ← Back to RFQ List
-        </button>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 text-xs">
-          <div class="text-slate-500">Created At</div>
-          <div class="mt-1 text-sm font-semibold text-slate-800">${currentRFQ.createdAt}</div>
-        </div>
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 text-xs">
-          <div class="text-slate-500">Last Updated</div>
-          <div class="mt-1 text-sm font-semibold text-slate-800">${currentRFQ.lastUpdated}</div>
-        </div>
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 text-xs">
-          <div class="text-slate-500">Team A Response</div>
-          <div class="mt-1 text-sm font-semibold text-slate-800">${currentRFQ.teamAResponse || "-"}</div>
-        </div>
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 text-xs">
-          <div class="text-slate-500">Overall Progress</div>
-          <div class="mt-1 text-sm font-semibold text-blue-700">${currentRFQ.progress || "0%"}</div>
-        </div>
-      </div>
-    </div>
-  `;
-
+ 
   const workflow = `
     <div class="max-w-6xl mx-auto mt-4 grid grid-cols-1 lg:grid-cols-4 gap-4 text-xs">
 
