@@ -1056,17 +1056,110 @@ renderRFQList();
    DASHBOARD RENDERING (PER RFQ)
 --------------------------------------------------------- */
 
+/* ============================================================
+   SECTION 1 — DASHBOARD LAYOUT (RFQ3 STYLE)
+   ============================================================ */
+
 function renderDashboard() {
   const view = document.getElementById("dashboardView");
-  view.innerHTML = "";
-
   if (!currentRFQ) {
     view.innerHTML = `
-      <div class="max-w-4xl mx-auto mt-6 bg-white border border-slate-200 rounded-xl p-4 text-xs text-slate-600">
+      <div class="p-4 text-sm text-slate-600">
         No RFQ selected.
       </div>`;
     return;
   }
+
+  view.innerHTML = `
+    <div class="rfq-header">
+      <h2>RFQ ID: ${currentRFQ.id}</h2>
+      <p>Customer: ${currentRFQ.customer}</p>
+      <p>Category: ${currentRFQ.category}</p>
+      <p>Status: ${currentRFQ.status}</p>
+      <p>Progress: ${currentRFQ.progress || "0%"}</p>
+    </div>
+
+    <div class="rfq-container">
+
+      <!-- LEFT WORKFLOW PANEL -->
+      <div class="rfq-left">
+
+        <div class="team-block">
+          <h3>Team A – RFQ & Commercial</h3>
+          <button onclick="submitRFQToTeamB()">Submit RFQ to Team B</button>
+          <button onclick="simulateTeamAResponse()">Resolve Missing Info</button>
+          <button onclick="releaseFromHold()">Release from Hold</button>
+        </div>
+
+        <div class="team-block">
+          <h3>Team B – Technical</h3>
+          <button onclick="markTeamCompleted('Team B')">Mark Team B Completed</button>
+          <button onclick="openHoldPanel('Team B')">Request Missing Info</button>
+        </div>
+
+        <div class="team-block">
+          <h3>Team C – Quality</h3>
+          <button onclick="markTeamCompleted('Team C')">Mark Team C Completed</button>
+          <button onclick="openHoldPanel('Team C')">Request Missing Info</button>
+        </div>
+
+        <div class="team-block">
+          <h3>Team D – Production Control</h3>
+          <button onclick="markTeamDCompleted()">Mark Team D Completed</button>
+          <button onclick="openHoldPanel('Team D')">Request Missing Info</button>
+        </div>
+
+        <div class="team-block">
+          <h3>Team E – Safety</h3>
+          <button onclick="markTeamCompleted('Team E')">Mark Team E Completed</button>
+          <button onclick="openHoldPanel('Team E')">Request Missing Info</button>
+        </div>
+
+        <div class="team-block">
+          <h3>Final Quotation</h3>
+          <button onclick="submitFinalQuotation()">Submit Final Quotation</button>
+        </div>
+
+      </div>
+
+      <!-- RIGHT PANEL -->
+      <div class="rfq-right">
+
+        <div class="panel-block">
+          <h3>Comments</h3>
+          <textarea id="commentInput" placeholder="Add comment..."></textarea>
+          <button onclick="addComment()">Add Comment</button>
+          <div id="commentsList"></div>
+        </div>
+
+        <div class="panel-block">
+          <h3>Attachments</h3>
+          <input id="attachmentInput" placeholder="Attachment name..." />
+          <button onclick="addAttachment()">Add Attachment</button>
+          <div id="attachmentsList"></div>
+        </div>
+
+        <div class="panel-block">
+          <h3>Notifications</h3>
+          <button onclick="clearNotifications()">Clear</button>
+          <div id="notificationsList"></div>
+        </div>
+
+        <div class="panel-block">
+          <h3>Hold History</h3>
+          <div id="holdHistoryList"></div>
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+  renderComments();
+  renderAttachments();
+  renderNotifications();
+  renderHoldHistory();
+ }
 
   const header = `
     <div class="max-w-6xl mx-auto mt-4 space-y-4">
