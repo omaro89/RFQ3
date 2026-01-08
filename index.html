@@ -36,123 +36,127 @@
       </div>
     </header>
 
-    <!-- Main content container -->
-    <main class="flex-1 p-4">
-      <!-- RFQ LIST VIEW -->
-      <section id="rfqListView" class="space-y-4">
-        <!-- Status cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 flex flex-col">
-            <div class="text-xs text-slate-500">Total RFQs</div>
-            <div id="cardTotalRFQs" class="mt-1 text-2xl font-semibold text-slate-800">0</div>
+<!-- Main content container -->
+<main class="flex-1 p-4">
+
+  <!-- RFQ LIST VIEW -->
+  <section id="rfqListView" class="space-y-4">
+    <!-- Status cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 flex flex-col">
+        <div class="text-xs text-slate-500">Total RFQs</div>
+        <div id="cardTotalRFQs" class="mt-1 text-2xl font-semibold text-slate-800">0</div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm border border-emerald-100 p-3 flex flex-col">
+        <div class="text-xs text-emerald-600">Open RFQs</div>
+        <div id="cardOpenRFQs" class="mt-1 text-2xl font-semibold text-emerald-700">0</div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm border border-amber-100 p-3 flex flex-col">
+        <div class="text-xs text-amber-600">On Hold</div>
+        <div id="cardOnHoldRFQs" class="mt-1 text-2xl font-semibold text-amber-700">0</div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm border border-violet-100 p-3 flex flex-col">
+        <div class="text-xs text-violet-600">Completed</div>
+        <div id="cardCompletedRFQs" class="mt-1 text-2xl font-semibold text-violet-700">0</div>
+      </div>
+    </div>
+
+    <!-- Search + filters + create button -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 flex flex-col gap-3">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div class="flex flex-col sm:flex-row gap-2 flex-1">
+          <div class="relative flex-1">
+            <input
+              id="searchInput"
+              type="text"
+              placeholder="Search by RFQ ID, Customer, or Part..."
+              class="w-full pl-8 pr-3 py-2 text-xs rounded-md border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+            <span class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs">🔍</span>
           </div>
-          <div class="bg-white rounded-xl shadow-sm border border-emerald-100 p-3 flex flex-col">
-            <div class="text-xs text-emerald-600">Open RFQs</div>
-            <div id="cardOpenRFQs" class="mt-1 text-2xl font-semibold text-emerald-700">0</div>
-          </div>
-          <div class="bg-white rounded-xl shadow-sm border border-amber-100 p-3 flex flex-col">
-            <div class="text-xs text-amber-600">On Hold</div>
-            <div id="cardOnHoldRFQs" class="mt-1 text-2xl font-semibold text-amber-700">0</div>
-          </div>
-          <div class="bg-white rounded-xl shadow-sm border border-violet-100 p-3 flex flex-col">
-            <div class="text-xs text-violet-600">Completed</div>
-            <div id="cardCompletedRFQs" class="mt-1 text-2xl font-semibold text-violet-700">0</div>
+          <div class="flex gap-2">
+            <select
+              id="statusFilter"
+              class="px-2 py-2 text-xs rounded-md border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+            >
+              <option value="all">All Statuses</option>
+              <option value="Open">Open</option>
+              <option value="On Hold">On Hold</option>
+              <option value="Completed">Completed</option>
+            </select>
+            <select
+              id="categoryFilter"
+              class="px-2 py-2 text-xs rounded-md border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+            >
+              <option value="all">All Categories</option>
+              <option value="Mechanical">Mechanical</option>
+              <option value="Electrical">Electrical</option>
+              <option value="Instrumentation">Instrumentation</option>
+              <option value="Other">Other</option>
+            </select>
           </div>
         </div>
-
-        <!-- Search + filters + create button -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 flex flex-col gap-3">
-          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            <div class="flex flex-col sm:flex-row gap-2 flex-1">
-              <div class="relative flex-1">
-                <input
-                  id="searchInput"
-                  type="text"
-                  placeholder="Search by RFQ ID, Customer, or Part..."
-                  class="w-full pl-8 pr-3 py-2 text-xs rounded-md border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
-                <span class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs">🔍</span>
-              </div>
-              <div class="flex gap-2">
-                <select
-                  id="statusFilter"
-                  class="px-2 py-2 text-xs rounded-md border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-                >
-                  <option value="all">All Statuses</option>
-                  <option value="Open">Open</option>
-                  <option value="On Hold">On Hold</option>
-                  <option value="Completed">Completed</option>
-                </select>
-                <select
-                  id="categoryFilter"
-                  class="px-2 py-2 text-xs rounded-md border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-                >
-                  <option value="all">All Categories</option>
-                  <option value="Mechanical">Mechanical</option>
-                  <option value="Electrical">Electrical</option>
-                  <option value="Instrumentation">Instrumentation</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-            </div>
-            <div class="flex justify-end">
-              <button
-                id="btnCreateNewRFQ"
-                class="inline-flex items-center gap-2 px-3 py-2 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700"
-              >
-                <span class="text-sm">＋</span>
-                <span>Create New RFQ</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- RFQ table -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3">
-          <div class="flex items-center justify-between mb-2">
-            <h2 class="text-sm font-semibold text-slate-800">RFQ List</h2>
-            <span id="rfqListCount" class="text-xs text-slate-400">0 RFQs</span>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="min-w-full text-xs border border-slate-200 rounded-lg overflow-hidden">
-              <thead class="bg-slate-50 text-slate-600">
-                <tr>
-                  <th class="px-3 py-2 border border-slate-200 text-left">RFQ ID</th>
-                  <th class="px-3 py-2 border border-slate-200 text-left">Customer</th>
-                  <th class="px-3 py-2 border border-slate-200 text-left">Part Description</th>
-                  <th class="px-3 py-2 border border-slate-200 text-left">Status</th>
-                  <th class="px-3 py-2 border border-slate-200 text-left">Created</th>
-                  <th class="px-3 py-2 border border-slate-200 text-left">Last Updated</th>
-                  <th class="px-3 py-2 border border-slate-200 text-left">Team A Response</th>
-                  <th class="px-3 py-2 border border-slate-200 text-left">Progress</th>
-                  <th class="px-3 py-2 border border-slate-200 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="rfqTableBody" class="divide-y divide-slate-100">
-                <!-- Rows will be injected by JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- RFQ CREATION WIZARD VIEW (HIDDEN BY DEFAULT) -->
-      <section id="wizardView" class="hidden max-w-5xl mx-auto">
-        <!-- Wizard header -->
-        <div class="mb-4 flex items-center justify-between">
-          <div>
-            <h2 class="text-sm font-semibold text-slate-800">Create New RFQ</h2>
-            <p class="text-xs text-slate-500">
-              Team A must complete all steps before the RFQ enters the workflow.
-            </p>
-          </div>
+        <div class="flex justify-end">
           <button
-            id="btnCancelWizard"
-            class="px-3 py-1.5 text-xs rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200"
+            id="btnCreateNewRFQ"
+            class="inline-flex items-center gap-2 px-3 py-2 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700"
           >
-            Back to RFQ List
+            <span class="text-sm">＋</span>
+            <span>Create New RFQ</span>
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- RFQ table -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-sm font-semibold text-slate-800">RFQ List</h2>
+        <span id="rfqListCount" class="text-xs text-slate-400">0 RFQs</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-xs border border-slate-200 rounded-lg overflow-hidden">
+          <thead class="bg-slate-50 text-slate-600">
+            <tr>
+              <th class="px-3 py-2 border border-slate-200 text-left">RFQ ID</th>
+              <th class="px-3 py-2 border border-slate-200 text-left">Customer</th>
+              <th class="px-3 py-2 border border-slate-200 text-left">Part Description</th>
+              <th class="px-3 py-2 border border-slate-200 text-left">Status</th>
+              <th class="px-3 py-2 border border-slate-200 text-left">Created</th>
+              <th class="px-3 py-2 border border-slate-200 text-left">Last Updated</th>
+              <th class="px-3 py-2 border border-slate-200 text-left">Team A Response</th>
+              <th class="px-3 py-2 border border-slate-200 text-left">Progress</th>
+              <th class="px-3 py-2 border border-slate-200 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="rfqTableBody" class="divide-y divide-slate-100">
+            <!-- Rows will be injected by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⭐ NEW DASHBOARD CONTAINER (REQUIRED) -->
+  <section id="dashboardView" class="hidden"></section>
+
+  <!-- RFQ CREATION WIZARD VIEW -->
+  <section id="wizardView" class="hidden max-w-5xl mx-auto">
+    <!-- Wizard header -->
+    <div class="mb-4 flex items-center justify-between">
+      <div>
+        <h2 class="text-sm font-semibold text-slate-800">Create New RFQ</h2>
+        <p class="text-xs text-slate-500">
+          Team A must complete all steps before the RFQ enters the workflow.
+        </p>
+      </div>
+      <button
+        id="btnCancelWizard"
+        class="px-3 py-1.5 text-xs rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200"
+      >
+        Back to RFQ List
+      </button>
+    </div>
 
         <!-- Horizontal stepper -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-4">
