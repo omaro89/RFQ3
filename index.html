@@ -1071,89 +1071,103 @@ function renderDashboard() {
   }
 
   view.innerHTML = `
-    <div class="rfq-header">
-      <h2>RFQ ID: ${currentRFQ.id}</h2>
-      <p>Customer: ${currentRFQ.customer}</p>
-      <p>Category: ${currentRFQ.category}</p>
-      <p>Status: ${currentRFQ.status}</p>
-      <p>Progress: ${currentRFQ.progress || "0%"}</p>
+  <div class="p-6 space-y-6">
+
+    <!-- HEADER -->
+    <div class="bg-white shadow rounded p-4 border border-slate-200">
+      <h2 class="text-xl font-semibold text-slate-800">RFQ ID: ${currentRFQ.id}</h2>
+      <p class="text-slate-600">Customer: <span class="font-medium">${currentRFQ.customer}</span></p>
+      <p class="text-slate-600">Category: <span class="font-medium">${currentRFQ.category}</span></p>
+      <p class="text-slate-600">Status: <span class="font-medium">${currentRFQ.status}</span></p>
+      <p class="text-slate-600">Progress: <span class="font-medium">${currentRFQ.progress || "0%"}</span></p>
     </div>
 
-    <div class="rfq-container">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
       <!-- LEFT WORKFLOW PANEL -->
-      <div class="rfq-left">
+      <div class="space-y-4">
 
-        <div class="team-block">
-          <h3>Team A – RFQ & Commercial</h3>
-          <button onclick="submitRFQToTeamB()">Submit RFQ to Team B</button>
-          <button onclick="simulateTeamAResponse()">Resolve Missing Info</button>
-          <button onclick="releaseFromHold()">Release from Hold</button>
+        <div class="bg-white shadow rounded p-4 border border-slate-200">
+          <h3 class="font-semibold text-slate-800 mb-2">Team A – RFQ & Commercial</h3>
+          <div class="space-x-2">
+            <button class="btn-primary" onclick="submitRFQToTeamB()">Submit RFQ to Team B</button>
+            <button class="btn-secondary" onclick="simulateTeamAResponse()">Resolve Missing Info</button>
+            <button class="btn-warning" onclick="releaseFromHold()">Release from Hold</button>
+          </div>
         </div>
 
-        <div class="team-block">
-          <h3>Team B – Technical</h3>
-          <button onclick="markTeamCompleted('Team B')">Mark Team B Completed</button>
-          <button onclick="openHoldPanel('Team B')">Request Missing Info</button>
+        <div class="bg-white shadow rounded p-4 border border-slate-200">
+          <h3 class="font-semibold text-slate-800 mb-2">Team B – Technical</h3>
+          <div class="space-x-2">
+            <button class="btn-primary" onclick="markTeamCompleted('Team B')">Mark Completed</button>
+            <button class="btn-warning" onclick="openHoldPanel('Team B')">Request Missing Info</button>
+          </div>
         </div>
 
-        <div class="team-block">
-          <h3>Team C – Quality</h3>
-          <button onclick="markTeamCompleted('Team C')">Mark Team C Completed</button>
-          <button onclick="openHoldPanel('Team C')">Request Missing Info</button>
+        <div class="bg-white shadow rounded p-4 border border-slate-200">
+          <h3 class="font-semibold text-slate-800 mb-2">Team C – Quality</h3>
+          <div class="space-x-2">
+            <button class="btn-primary" onclick="markTeamCompleted('Team C')">Mark Completed</button>
+            <button class="btn-warning" onclick="openHoldPanel('Team C')">Request Missing Info</button>
+          </div>
         </div>
 
-        <div class="team-block">
-          <h3>Team D – Production Control</h3>
-          <button onclick="markTeamDCompleted()">Mark Team D Completed</button>
-          <button onclick="openHoldPanel('Team D')">Request Missing Info</button>
+        <div class="bg-white shadow rounded p-4 border border-slate-200">
+          <h3 class="font-semibold text-slate-800 mb-2">Team D – Production Control</h3>
+          <div class="space-x-2">
+            <button class="btn-primary" onclick="markTeamDCompleted()">Mark Completed</button>
+            <button class="btn-warning" onclick="openHoldPanel('Team D')">Request Missing Info</button>
+          </div>
         </div>
 
-        <div class="team-block">
-          <h3>Team E – Safety</h3>
-          <button onclick="markTeamCompleted('Team E')">Mark Team E Completed</button>
-          <button onclick="openHoldPanel('Team E')">Request Missing Info</button>
+        <div class="bg-white shadow rounded p-4 border border-slate-200">
+          <h3 class="font-semibold text-slate-800 mb-2">Team E – Safety</h3>
+          <div class="space-x-2">
+            <button class="btn-primary" onclick="markTeamCompleted('Team E')">Mark Completed</button>
+            <button class="btn-warning" onclick="openHoldPanel('Team E')">Request Missing Info</button>
+          </div>
         </div>
 
-        <div class="team-block">
-          <h3>Final Quotation</h3>
-          <button onclick="submitFinalQuotation()">Submit Final Quotation</button>
+        <div class="bg-white shadow rounded p-4 border border-slate-200">
+          <h3 class="font-semibold text-slate-800 mb-2">Final Quotation</h3>
+          <button class="btn-success" onclick="submitFinalQuotation()">Submit Final Quotation</button>
         </div>
 
       </div>
 
       <!-- RIGHT PANEL -->
-      <div class="rfq-right">
+      <div class="space-y-4">
 
-        <div class="panel-block">
-          <h3>Comments</h3>
-          <textarea id="commentInput" placeholder="Add comment..."></textarea>
-          <button onclick="addComment()">Add Comment</button>
-          <div id="commentsList"></div>
+        <div class="bg-white shadow rounded p-4 border border-slate-200">
+          <h3 class="font-semibold text-slate-800 mb-2">Comments</h3>
+          <textarea id="commentInput" class="input w-full mb-2" placeholder="Add comment..."></textarea>
+          <button class="btn-primary" onclick="addComment()">Add Comment</button>
+          <div id="commentsList" class="mt-3 space-y-2"></div>
         </div>
 
-        <div class="panel-block">
-          <h3>Attachments</h3>
-          <input id="attachmentInput" placeholder="Attachment name..." />
-          <button onclick="addAttachment()">Add Attachment</button>
-          <div id="attachmentsList"></div>
+        <div class="bg-white shadow rounded p-4 border border-slate-200">
+          <h3 class="font-semibold text-slate-800 mb-2">Attachments</h3>
+          <input id="attachmentInput" class="input w-full mb-2" placeholder="Attachment name..." />
+          <button class="btn-primary" onclick="addAttachment()">Add Attachment</button>
+          <div id="attachmentsList" class="mt-3 space-y-2"></div>
         </div>
 
-        <div class="panel-block">
-          <h3>Notifications</h3>
-          <button onclick="clearNotifications()">Clear</button>
-          <div id="notificationsList"></div>
+        <div class="bg-white shadow rounded p-4 border border-slate-200">
+          <h3 class="font-semibold text-slate-800 mb-2">Notifications</h3>
+          <button class="btn-secondary mb-2" onclick="clearNotifications()">Clear</button>
+          <div id="notificationsList" class="space-y-2"></div>
         </div>
 
-        <div class="panel-block">
-          <h3>Hold History</h3>
-          <div id="holdHistoryList"></div>
+        <div class="bg-white shadow rounded p-4 border border-slate-200">
+          <h3 class="font-semibold text-slate-800 mb-2">Hold History</h3>
+          <div id="holdHistoryList" class="space-y-2"></div>
         </div>
 
       </div>
 
     </div>
-  `;
+  </div>
+`;
 
   renderComments();
   renderAttachments();
